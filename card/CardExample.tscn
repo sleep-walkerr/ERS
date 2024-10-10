@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://ldd5jtf6nodt"]
+
+[ext_resource type="Texture2D" uid="uid://b17t188khd8wm" path="res://svg_playing_cards/fronts/clubs_2.svg" id="1_j1oax"]
+[ext_resource type="Script" path="res://card/card.gd" id="2_ext5s"]
+
+[node name="CardExample" type="Sprite2D"]
+texture = ExtResource("1_j1oax")
+script = ExtResource("2_ext5s")
