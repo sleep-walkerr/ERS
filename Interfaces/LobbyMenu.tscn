@@ -1,0 +1,87 @@
+[gd_scene load_steps=5 format=3 uid="uid://byx0mfk606ssv"]
+
+[ext_resource type="Script" path="res://Interfaces/lobby_menu.gd" id="1_6ojlm"]
+[ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="2_n84fe"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_5clkg"]
+radius = 50.0
+height = 100.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_27m3y"]
+font_color = Color(0, 1, 1, 1)
+
+[node name="LobbyMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6ojlm")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+modulate = Color(0, 1, 1, 1)
+position = Vector2(960, 200)
+scale = Vector2(3, 3)
+mesh = SubResource("SphereMesh_5clkg")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("2_n84fe")
+stretch_mode = 3
+
+[node name="LobbyID" type="Label" parent="."]
+offset_left = 943.0
+offset_top = 435.0
+offset_right = 1065.0
+offset_bottom = 531.0
+text = "51971"
+label_settings = SubResource("LabelSettings_27m3y")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayerLabel" type="Label" parent="."]
+offset_left = 839.0
+offset_top = 497.0
+offset_right = 961.0
+offset_bottom = 593.0
+text = "P1"
+label_settings = SubResource("LabelSettings_27m3y")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LobbyIDLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 838.0
+offset_top = 438.0
+offset_right = 960.0
+offset_bottom = 534.0
+text = "Lobby ID"
+label_settings = SubResource("LabelSettings_27m3y")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ReadyButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 919.0
+offset_top = 605.0
+offset_right = 1000.0
+offset_bottom = 636.0
+text = "Ready"
+
+[node name="ReturnButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 919.0
+offset_top = 735.0
+offset_right = 1000.0
+offset_bottom = 766.0
+text = "Return"

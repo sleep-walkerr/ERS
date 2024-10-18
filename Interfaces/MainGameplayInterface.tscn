@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cv4ux0seenp62"]
+
+[ext_resource type="Script" path="res://Interfaces/main_gameplay_interface.gd" id="1_mt75l"]
+
+[node name="MainGameplayInterface" type="Node2D"]
+script = ExtResource("1_mt75l")

@@ -1,0 +1,78 @@
+[gd_scene load_steps=5 format=3 uid="uid://dehh2f1yg2ryi"]
+
+[ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="1_il1ba"]
+[ext_resource type="Script" path="res://Interfaces/main_menu.gd" id="1_qrtgj"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_5clkg"]
+radius = 50.0
+height = 100.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_27m3y"]
+font_size = 70
+font_color = Color(0, 1, 1, 1)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qrtgj")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+modulate = Color(0, 1, 1, 1)
+position = Vector2(960, 200)
+scale = Vector2(3, 3)
+mesh = SubResource("SphereMesh_5clkg")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_il1ba")
+stretch_mode = 3
+
+[node name="TitleLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 995.0
+offset_top = 380.0
+offset_right = 1117.0
+offset_bottom = 476.0
+text = "ERS"
+label_settings = SubResource("LabelSettings_27m3y")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HostButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1003.0
+offset_top = 473.0
+offset_right = 1047.0
+offset_bottom = 504.0
+text = "Host"
+
+[node name="JoinButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1004.0
+offset_top = 508.0
+offset_right = 1048.0
+offset_bottom = 539.0
+text = "Join"
+
+[node name="QuitButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1005.0
+offset_top = 547.0
+offset_right = 1049.0
+offset_bottom = 578.0
+text = "Quit"
+
+[connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]

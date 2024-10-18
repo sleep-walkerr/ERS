@@ -1,0 +1,75 @@
+[gd_scene load_steps=5 format=3 uid="uid://buagmybfsrc7y"]
+
+[ext_resource type="Script" path="res://Interfaces/join_menu.gd" id="1_sa6wy"]
+[ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="1_ujx2k"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_5clkg"]
+radius = 50.0
+height = 100.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_27m3y"]
+font_color = Color(0, 1, 1, 1)
+
+[node name="JoinMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_sa6wy")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+modulate = Color(0, 1, 1, 1)
+position = Vector2(960, 200)
+scale = Vector2(3, 3)
+mesh = SubResource("SphereMesh_5clkg")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_ujx2k")
+stretch_mode = 3
+
+[node name="UserPrompt" type="Label" parent="."]
+layout_mode = 0
+offset_left = 838.0
+offset_top = 438.0
+offset_right = 960.0
+offset_bottom = 534.0
+text = "Enter Lobby ID"
+label_settings = SubResource("LabelSettings_27m3y")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IDEntry" type="LineEdit" parent="."]
+layout_mode = 0
+offset_left = 967.0
+offset_top = 469.0
+offset_right = 1172.0
+offset_bottom = 504.0
+placeholder_text = "ID"
+
+[node name="JoinButton" type="Button" parent="."]
+layout_mode = 1
+offset_left = 941.0
+offset_top = 556.0
+offset_right = 979.0
+offset_bottom = 587.0
+text = "Join"
+
+[node name="ReturnButton" type="Button" parent="."]
+layout_mode = 1
+offset_left = 942.0
+offset_top = 595.0
+offset_right = 980.0
+offset_bottom = 626.0
+text = "Return"
