@@ -147,6 +147,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LobbyID" type="Label" parent="."]
+layout_mode = 0
 offset_left = 861.0
 offset_top = 363.0
 offset_right = 1056.0
@@ -166,6 +167,7 @@ offset_bottom = 758.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_576lu")
 
 [node name="LobbyID4" type="Label" parent="Panel"]
+layout_mode = 0
 offset_left = 33.0
 offset_top = 147.0
 offset_right = 228.0
@@ -178,6 +180,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LobbyID2" type="Label" parent="Panel"]
+layout_mode = 0
 offset_left = 34.0
 offset_top = 23.0
 offset_right = 229.0
@@ -190,6 +193,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LobbyID3" type="Label" parent="Panel"]
+layout_mode = 0
 offset_left = 33.0
 offset_top = 86.0
 offset_right = 228.0

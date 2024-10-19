@@ -86,6 +86,7 @@ offset_bottom = 606.0
 text = "Return"
 
 [node name="LobbyIDLabel" type="Label" parent="."]
+layout_mode = 0
 offset_left = 862.0
 offset_top = 306.0
 offset_right = 1059.0
