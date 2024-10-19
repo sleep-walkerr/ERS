@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://buagmybfsrc7y"]
+[gd_scene load_steps=9 format=3 uid="uid://buagmybfsrc7y"]
 
 [ext_resource type="Script" path="res://Interfaces/join_menu.gd" id="1_sa6wy"]
 [ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="1_ujx2k"]
+[ext_resource type="FontFile" uid="uid://xo4k2q4thc2f" path="res://Rubik/static/Rubik-Bold.ttf" id="3_qbpf3"]
+[ext_resource type="FontFile" uid="uid://dfwpq8hknmqt3" path="res://Rubik/Rubik-VariableFont_wght.ttf" id="4_m2arc"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_5clkg"]
 radius = 50.0
@@ -9,6 +11,23 @@ height = 100.0
 
 [sub_resource type="LabelSettings" id="LabelSettings_27m3y"]
 font_color = Color(0, 1, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_s0y4n"]
+font = ExtResource("3_qbpf3")
+font_size = 36
+font_color = Color(0, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3fxw"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0.8, 0.8, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
 
 [node name="JoinMenu" type="Control"]
 layout_mode = 3
@@ -41,35 +60,49 @@ stretch_mode = 3
 
 [node name="UserPrompt" type="Label" parent="."]
 layout_mode = 0
-offset_left = 838.0
-offset_top = 438.0
-offset_right = 960.0
-offset_bottom = 534.0
+offset_left = 899.0
+offset_top = 359.0
+offset_right = 1021.0
+offset_bottom = 455.0
 text = "Enter Lobby ID"
 label_settings = SubResource("LabelSettings_27m3y")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="IDEntry" type="LineEdit" parent="."]
-layout_mode = 0
-offset_left = 967.0
-offset_top = 469.0
-offset_right = 1172.0
-offset_bottom = 504.0
-placeholder_text = "ID"
-
 [node name="JoinButton" type="Button" parent="."]
 layout_mode = 1
-offset_left = 941.0
-offset_top = 556.0
-offset_right = 979.0
-offset_bottom = 587.0
+offset_left = 943.0
+offset_top = 522.0
+offset_right = 981.0
+offset_bottom = 553.0
 text = "Join"
 
 [node name="ReturnButton" type="Button" parent="."]
 layout_mode = 1
-offset_left = 942.0
-offset_top = 595.0
-offset_right = 980.0
-offset_bottom = 626.0
+offset_left = 932.0
+offset_top = 575.0
+offset_right = 993.0
+offset_bottom = 606.0
 text = "Return"
+
+[node name="LobbyIDLabel" type="Label" parent="."]
+offset_left = 862.0
+offset_top = 306.0
+offset_right = 1059.0
+offset_bottom = 402.0
+text = "Join"
+label_settings = SubResource("LabelSettings_s0y4n")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IDEntry" type="LineEdit" parent="."]
+layout_mode = 0
+offset_left = 865.0
+offset_top = 428.0
+offset_right = 1060.0
+offset_bottom = 487.0
+theme_override_fonts/font = ExtResource("4_m2arc")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_h3fxw")
+placeholder_text = "Enter Lobby ID"
+alignment = 1

@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://dehh2f1yg2ryi"]
+[gd_scene load_steps=7 format=3 uid="uid://dehh2f1yg2ryi"]
 
 [ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="1_il1ba"]
 [ext_resource type="Script" path="res://Interfaces/main_menu.gd" id="1_qrtgj"]
 [ext_resource type="FontFile" uid="uid://b4y6u8ri60rvc" path="res://Rubik_Glitch/RubikGlitch-Regular.ttf" id="3_e6jtd"]
+[ext_resource type="FontFile" uid="uid://dfwpq8hknmqt3" path="res://Rubik/Rubik-VariableFont_wght.ttf" id="4_30nju"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_5clkg"]
 radius = 50.0
@@ -59,6 +60,7 @@ offset_left = 1003.0
 offset_top = 473.0
 offset_right = 1047.0
 offset_bottom = 504.0
+theme_override_fonts/font = ExtResource("4_30nju")
 text = "Host"
 
 [node name="JoinButton" type="Button" parent="."]
@@ -67,6 +69,7 @@ offset_left = 1004.0
 offset_top = 508.0
 offset_right = 1048.0
 offset_bottom = 539.0
+theme_override_fonts/font = ExtResource("4_30nju")
 text = "Join"
 
 [node name="QuitButton" type="Button" parent="."]
@@ -75,6 +78,7 @@ offset_left = 1005.0
 offset_top = 547.0
 offset_right = 1049.0
 offset_bottom = 578.0
+theme_override_fonts/font = ExtResource("4_30nju")
 text = "Quit"
 
 [connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]
