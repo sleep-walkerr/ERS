@@ -1,13 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://dehh2f1yg2ryi"]
+[gd_scene load_steps=6 format=3 uid="uid://dehh2f1yg2ryi"]
 
 [ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="1_il1ba"]
 [ext_resource type="Script" path="res://Interfaces/main_menu.gd" id="1_qrtgj"]
+[ext_resource type="FontFile" uid="uid://b4y6u8ri60rvc" path="res://Rubik_Glitch/RubikGlitch-Regular.ttf" id="3_e6jtd"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_5clkg"]
 radius = 50.0
 height = 100.0
 
 [sub_resource type="LabelSettings" id="LabelSettings_27m3y"]
+font = ExtResource("3_e6jtd")
 font_size = 70
 font_color = Color(0, 1, 1, 1)
 

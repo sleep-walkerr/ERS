@@ -14,10 +14,10 @@ config/name="ERS"
 run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 run/max_fps=120
-boot_splash/bg_color=Color(0.203922, 0.635294, 0.282353, 1)
+boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/image="res://splash.png"
 boot_splash/fullsize=false
-config/icon="res://icon.svg"
+config/icon="res://Icon.png"
 boot_splash/minimum_display_time=2000
 
 [display]
