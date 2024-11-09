@@ -10,12 +10,6 @@ func _ready() -> void:
 	current_interface = load("res://Interfaces/MainMenu.tscn").instantiate()
 	self.add_child(current_interface)
 	
-	
-	
-	
-	
-
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
@@ -45,40 +39,43 @@ func ServerHasDisconnected(): # only called on clients
 	
 func ClientConnectedToServer(id): # only called on server when clients connect
 	# find out how to prevent new connections after lobby interface is closed
-	print("Someone connected: ", id)
+	print(id, " connected")
 	# Add new player to players dictionary
 	players[id] = multiplayer.get_peers().size() + 1 # id of player is matched to player number
-	# Make their label visible for all players
-	var new_player_label = current_interface.find_child("PlayerLabels").get_child(players[id]-1) # in list of player labels, get index based on player number - 1
-	new_player_label.visible = true # set it to visible locally
-	UpdateLobbyPlayerList.rpc(new_player_label.get_path()) # set it to visible remote
-	# set hosts label to visible 
-	UpdateLobbyPlayerList.rpc_id(id, current_interface.find_child("PlayerLabels").get_child(players[get_parent().multiplayer.get_unique_id()]-1).get_path())
-	#Update the players dictionary for everyone
+	# Add new player to lobby dictionary 
+	var new_player_label = current_interface.find_child("PlayerLabels").get_child(players[id]-1).get_path()
+	current_interface.player_ready_status[id] = {"ready" : false, "path_to_label" : new_player_label}
+	UpdateLobbyPlayerList.rpc(current_interface.player_ready_status) # send updated player list to clients and update their view
 	UpdatePlayersDictionary.rpc(players)
 	
 func ClientDisconnectedFromServer(id): # server signal for when clients disconnect
 	print(id, " has disconnected...")
 	players.erase(id) # remove client from players list
+	RemovePlayerFromLobbyList.rpc(id)
 	UpdatePlayersDictionary.rpc(players)
 	
-
 @rpc
 func UpdatePlayersDictionary(new_players_dict):
 	print("Updating Dictionary...")
 	players = new_players_dict
 	
 	
-@rpc("any_peer")
-func UpdatePlayerLobbyStatus(path, ready):
-	if current_interface.name == "LobbyInterface":
-		print("updating...")
-		if ready:
-			get_node(path).label_settings.font_color = Color(0.12, 0.76, 0.2)
+@rpc("any_peer", "call_local", "reliable", 0)
+func UpdateLobbyPlayerList(player_list): # used for adding players and updating their ready status
+	# for all pieces of information given for each player in the list, update everything accordingly (i.e. ready up status)
+	current_interface.player_ready_status = player_list
+	for player in player_list:
+		# make sure label is visible
+		if !get_node(player_list[player]["path_to_label"]).visible:
+			get_node(player_list[player]["path_to_label"]).visible = true
+		# Change text color to indicate if readied up or not
+		if player_list[player]["ready"]:
+			get_node(player_list[player]["path_to_label"]).label_settings.font_color = Color(0.12, 0.76, 0.2)
 		else:
-			get_node(path).label_settings.font_color = Color(0, 0, 0)
-
-	
-@rpc
-func UpdateLobbyPlayerList(path): # used to make player labels visible for all players in lobby according to players present
-	get_node(path).visible = true # sets player label to visible indicating they have joined the lobby
+			get_node(player_list[player]["path_to_label"]).label_settings.font_color = Color(0, 0, 0)
+			
+@rpc("any_peer", "call_local", "reliable", 0)
+func RemovePlayerFromLobbyList(id):
+	if current_interface.name == "LobbyMenu":
+		get_node(current_interface.player_ready_status[id]["path_to_label"]).visible = false
+		current_interface.player_ready_status.erase(id)

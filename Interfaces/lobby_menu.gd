@@ -1,5 +1,7 @@
 extends Control
 
+var player_ready_status = {} # key: player_id, value: [bool ready, path_to_label]
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -9,6 +11,7 @@ func _ready() -> void:
 	if multiplayer.is_server():
 		get_parent().player_number = 1
 		get_parent().players[1] = 1
+		player_ready_status[multiplayer.get_unique_id()] = {"ready" : false, "path_to_label" : $CenterContainer/Panel/PanelLayout/PlayerLabels/Player1Label.get_path()}
 		$CenterContainer/Panel/PanelLayout/PlayerLabels/Player1Label.visible = true
 		
 
@@ -22,7 +25,7 @@ func _on_ready_button_toggled(toggled_on: bool) -> void:
 	var multiplayer_id = get_parent().multiplayer.get_unique_id()
 	# Change the color of your own label
 	if toggled_on:
-		$CenterContainer/Panel/PanelLayout/PlayerLabels.get_child(get_parent().players[get_parent().multiplayer.get_unique_id()] - 1).label_settings.font_color = Color(0.12, 0.76, 0.2)
+		player_ready_status[multiplayer.get_unique_id()]["ready"] = true
 	else:
-		$CenterContainer/Panel/PanelLayout/PlayerLabels.get_child(get_parent().players[get_parent().multiplayer.get_unique_id()] - 1).label_settings.font_color = Color(0, 0, 0)
-	get_parent().UpdatePlayerLobbyStatus.rpc($CenterContainer/Panel/PanelLayout/PlayerLabels.get_child(get_parent().players[multiplayer_id] - 1).get_path(), toggled_on)
+		player_ready_status[multiplayer.get_unique_id()]["ready"] = false
+	get_parent().UpdateLobbyPlayerList.rpc(player_ready_status)

@@ -5,6 +5,7 @@ extends Control
 func _ready() -> void:
 	$HostButton.pressed.connect(Callable(get_node("/root/Main"), "SwitchInterface").bind("LobbyMenu"))
 	$JoinButton.pressed.connect(Callable(get_node("/root/Main"), "SwitchInterface").bind("JoinMenu"))
+	get_parent().multiplayer.multiplayer_peer = null
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -20,4 +21,5 @@ func _on_host_button_pressed() -> void:
 	peer.create_server(9999, 4)
 	get_parent().multiplayer.multiplayer_peer = peer
 	get_parent().multiplayer.peer_connected.connect(get_parent().ClientConnectedToServer)
+	get_parent().multiplayer.peer_disconnected.connect(get_parent().ClientDisconnectedFromServer)
 	
