@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://byx0mfk606ssv"]
+[gd_scene load_steps=18 format=3 uid="uid://byx0mfk606ssv"]
 
 [ext_resource type="Script" path="res://Interfaces/lobby_menu.gd" id="1_6ojlm"]
 [ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="2_n84fe"]
@@ -55,7 +55,7 @@ corner_radius_top_right = 15
 corner_radius_bottom_right = 15
 corner_radius_bottom_left = 15
 
-[sub_resource type="LabelSettings" id="LabelSettings_fxydg"]
+[sub_resource type="LabelSettings" id="LabelSettings_dxpft"]
 font = ExtResource("4_1k7x1")
 font_size = 22
 font_color = Color(0, 0, 0, 1)
@@ -66,6 +66,11 @@ font_size = 22
 font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_wjekt"]
+font = ExtResource("4_1k7x1")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_dl340"]
 font = ExtResource("4_1k7x1")
 font_size = 22
 font_color = Color(0, 0, 0, 1)
@@ -185,7 +190,7 @@ size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("4_1k7x1")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
 text = "Player 1"
-label_settings = SubResource("LabelSettings_fxydg")
+label_settings = SubResource("LabelSettings_dxpft")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -223,8 +228,8 @@ size_flags_horizontal = 4
 size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("4_1k7x1")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
-text = "Player 3"
-label_settings = SubResource("LabelSettings_wjekt")
+text = "Player 4"
+label_settings = SubResource("LabelSettings_dl340")
 horizontal_alignment = 1
 vertical_alignment = 1
 

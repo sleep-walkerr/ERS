@@ -10,7 +10,7 @@ func _ready() -> void:
 	
 	if multiplayer.is_server():
 		get_parent().player_number = 1
-		get_parent().players[1] = 1
+		get_parent().players[0] = 1
 		player_ready_status[multiplayer.get_unique_id()] = {"ready" : false, "path_to_label" : $CenterContainer/Panel/PanelLayout/PlayerLabels/Player1Label.get_path()}
 		$CenterContainer/Panel/PanelLayout/PlayerLabels/Player1Label.visible = true
 		
@@ -25,7 +25,7 @@ func _on_ready_button_toggled(toggled_on: bool) -> void:
 	var multiplayer_id = get_parent().multiplayer.get_unique_id()
 	# Change the color of your own label
 	if toggled_on:
-		player_ready_status[multiplayer.get_unique_id()]["ready"] = true
+		player_ready_status[multiplayer_id]["ready"] = true
 	else:
-		player_ready_status[multiplayer.get_unique_id()]["ready"] = false
+		player_ready_status[multiplayer_id]["ready"] = false
 	get_parent().UpdateLobbyPlayerList.rpc(player_ready_status)

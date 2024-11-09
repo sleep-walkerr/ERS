@@ -41,14 +41,26 @@ func ClientConnectedToServer(id): # only called on server when clients connect
 	# find out how to prevent new connections after lobby interface is closed
 	print(id, " connected")
 	# Add new player to players dictionary
-	players[id] = multiplayer.get_peers().size() + 1 # id of player is matched to player number
-	# Add new player to lobby dictionary 
-	var new_player_label = current_interface.find_child("PlayerLabels").get_child(players[id]-1).get_path()
-	current_interface.player_ready_status[id] = {"ready" : false, "path_to_label" : new_player_label}
-	UpdateLobbyPlayerList.rpc(current_interface.player_ready_status) # send updated player list to clients and update their view
-	UpdatePlayersDictionary.rpc(players)
+	if players.size() < 4:
+		multiplayer.multiplayer_peer.refuse_new_connections = false
+		for i in range(4):
+			if !players.has(i):
+				print("adding player")
+				players[i] = id
+				# Add new player to lobby dictionary 
+				var new_player_label = current_interface.find_child("PlayerLabels").get_child(i).get_path()
+				print("i: ",i," player_label_path: ", new_player_label)
+				current_interface.player_ready_status[id] = {"ready" : false, "path_to_label" : new_player_label}
+				UpdateLobbyPlayerList.rpc(current_interface.player_ready_status) # send updated player list to clients and update their view
+				UpdatePlayersDictionary.rpc(players)
+				break
+	elif players.size() >= 4:
+		multiplayer.multiplayer_peer.refuse_new_connections = true
+		multiplayer.multiplayer_peer.disconnect_peer(id)
+		print("Refusing new connections...")
 	
 func ClientDisconnectedFromServer(id): # server signal for when clients disconnect
+	# needs updating for changes to players
 	print(id, " has disconnected...")
 	players.erase(id) # remove client from players list
 	RemovePlayerFromLobbyList.rpc(id)
@@ -63,6 +75,9 @@ func UpdatePlayersDictionary(new_players_dict):
 @rpc("any_peer", "call_local", "reliable", 0)
 func UpdateLobbyPlayerList(player_list): # used for adding players and updating their ready status
 	# for all pieces of information given for each player in the list, update everything accordingly (i.e. ready up status)
+	print("Players: ", players)
+	print("Player List: ", player_list, "\n")
+	
 	current_interface.player_ready_status = player_list
 	for player in player_list:
 		# make sure label is visible
@@ -70,6 +85,7 @@ func UpdateLobbyPlayerList(player_list): # used for adding players and updating 
 			get_node(player_list[player]["path_to_label"]).visible = true
 		# Change text color to indicate if readied up or not
 		if player_list[player]["ready"]:
+			print("Marking ", player, " ready...")
 			get_node(player_list[player]["path_to_label"]).label_settings.font_color = Color(0.12, 0.76, 0.2)
 		else:
 			get_node(player_list[player]["path_to_label"]).label_settings.font_color = Color(0, 0, 0)
