@@ -55,17 +55,17 @@ corner_radius_top_right = 15
 corner_radius_bottom_right = 15
 corner_radius_bottom_left = 15
 
-[sub_resource type="LabelSettings" id="LabelSettings_wjekt"]
+[sub_resource type="LabelSettings" id="LabelSettings_fxydg"]
 font = ExtResource("4_1k7x1")
 font_size = 22
 font_color = Color(0, 0, 0, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_fxydg"]
+[sub_resource type="LabelSettings" id="LabelSettings_btbkg"]
 font = ExtResource("4_1k7x1")
 font_size = 22
-font_color = Color(0, 1, 0, 1)
+font_color = Color(0, 0, 0, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_btbkg"]
+[sub_resource type="LabelSettings" id="LabelSettings_wjekt"]
 font = ExtResource("4_1k7x1")
 font_size = 22
 font_color = Color(0, 0, 0, 1)
@@ -106,20 +106,20 @@ corner_radius_top_right = 15
 corner_radius_bottom_right = 15
 corner_radius_bottom_left = 15
 
-[node name="LobbyMenu" type="Control"]
-layout_mode = 3
+[node name="LobbyMenu" type="CenterContainer"]
+clip_contents = true
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_6ojlm")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
-layout_mode = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
+layout_mode = 2
 color = Color(0, 0, 0, 1)
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="."]
@@ -129,62 +129,59 @@ scale = Vector2(3, 3)
 mesh = SubResource("SphereMesh_5clkg")
 
 [node name="Background" type="TextureRect" parent="."]
-layout_mode = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
+layout_mode = 2
 texture = ExtResource("2_n84fe")
 stretch_mode = 3
 
-[node name="LobbyIDLabel" type="Label" parent="."]
-layout_mode = 0
-offset_left = 899.0
-offset_top = 289.0
-offset_right = 1021.0
-offset_bottom = 385.0
+[node name="CenterContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="LobbyIDLabel" type="Label" parent="CenterContainer"]
+layout_mode = 2
 text = "Lobby"
 label_settings = SubResource("LabelSettings_27m3y")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LobbyID" type="Label" parent="."]
-layout_mode = 0
-offset_left = 861.0
-offset_top = 363.0
-offset_right = 1056.0
-offset_bottom = 422.0
+[node name="LobbyID" type="Label" parent="CenterContainer"]
+custom_minimum_size = Vector2(225, 0)
+layout_mode = 2
+size_flags_horizontal = 4
 theme_override_styles/normal = SubResource("StyleBoxFlat_dcjkc")
-text = "51971"
+text = "127.0.0.1"
 label_settings = SubResource("LabelSettings_l1evl")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Panel" type="Panel" parent="."]
-layout_mode = 0
-offset_left = 828.0
-offset_top = 435.0
-offset_right = 1092.0
-offset_bottom = 758.0
+[node name="Panel" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(325, 430)
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_576lu")
 
-[node name="LobbyID4" type="Label" parent="Panel"]
-layout_mode = 0
-offset_left = 33.0
-offset_top = 147.0
-offset_right = 228.0
-offset_bottom = 206.0
-theme_override_fonts/font = ExtResource("4_1k7x1")
-theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
-text = "Player 3"
-label_settings = SubResource("LabelSettings_wjekt")
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="PanelLayout" type="VBoxContainer" parent="CenterContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
 
-[node name="LobbyID2" type="Label" parent="Panel"]
-layout_mode = 0
-offset_left = 34.0
-offset_top = 23.0
-offset_right = 229.0
-offset_bottom = 82.0
+[node name="Spacer" type="Label" parent="CenterContainer/Panel/PanelLayout"]
+custom_minimum_size = Vector2(200, 30)
+layout_mode = 2
+
+[node name="PlayerLabels" type="VBoxContainer" parent="CenterContainer/Panel/PanelLayout"]
+custom_minimum_size = Vector2(0, 325)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Player1Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("4_1k7x1")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
 text = "Player 1"
@@ -192,12 +189,12 @@ label_settings = SubResource("LabelSettings_fxydg")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LobbyID3" type="Label" parent="Panel"]
-layout_mode = 0
-offset_left = 33.0
-offset_top = 86.0
-offset_right = 228.0
-offset_bottom = 145.0
+[node name="Player2Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("4_1k7x1")
 theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
 text = "Player 2"
@@ -205,12 +202,42 @@ label_settings = SubResource("LabelSettings_btbkg")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ReadyButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 907.0
-offset_top = 694.0
-offset_right = 1016.0
-offset_bottom = 742.0
+[node name="Player3Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("4_1k7x1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
+text = "Player 3"
+label_settings = SubResource("LabelSettings_wjekt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player4Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("4_1k7x1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
+text = "Player 3"
+label_settings = SubResource("LabelSettings_wjekt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterContainer" type="VBoxContainer" parent="CenterContainer/Panel/PanelLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 2
+
+[node name="ReadyButton" type="Button" parent="CenterContainer/Panel/PanelLayout/CenterContainer"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
 focus_mode = 0
 theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
@@ -223,10 +250,16 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_g7qxu")
 toggle_mode = true
 text = "Ready"
 
-[node name="ReturnButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 920.0
-offset_top = 779.0
-offset_right = 1001.0
-offset_bottom = 810.0
+[node name="Spacer" type="Label" parent="CenterContainer/Panel/PanelLayout/CenterContainer"]
+custom_minimum_size = Vector2(100, 25)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="ReturnButton" type="Button" parent="CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "Return"
+
+[connection signal="toggled" from="CenterContainer/Panel/PanelLayout/CenterContainer/ReadyButton" to="." method="_on_ready_button_toggled"]

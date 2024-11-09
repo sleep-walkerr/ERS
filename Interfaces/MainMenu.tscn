@@ -81,4 +81,5 @@ offset_bottom = 578.0
 theme_override_fonts/font = ExtResource("4_30nju")
 text = "Quit"
 
+[connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]

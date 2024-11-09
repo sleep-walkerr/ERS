@@ -403,7 +403,7 @@ process_callback = 0
 one_shot = true
 
 [node name="Clubs2" type="AnimatedSprite2D" parent="."]
-position = Vector2(505, 231)
+position = Vector2(262, 269)
 sprite_frames = SubResource("SpriteFrames_io440")
 autoplay = "default"
 frame = 59
