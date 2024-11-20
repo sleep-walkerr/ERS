@@ -26,6 +26,8 @@ func SwitchInterface(next_interface) -> void: # Switch to Another Interface
 		#current_interface.position = get_window().size / Vector2i(2,2)
 		#--Place interface in main scene
 		self.add_child(current_interface)
+	else:
+		print("Interface ",next_interface," does not exist.")
 
 func ConnectedToLobby(): # only called on clients
 	SwitchInterface("LobbyMenu")
@@ -45,11 +47,9 @@ func ClientConnectedToServer(id): # only called on server when clients connect
 		multiplayer.multiplayer_peer.refuse_new_connections = false
 		for i in range(4):
 			if !players.has(i):
-				print("adding player")
 				players[i] = id
 				# Add new player to lobby dictionary 
 				var new_player_label = current_interface.find_child("PlayerLabels").get_child(i).get_path()
-				print("i: ",i," player_label_path: ", new_player_label)
 				current_interface.player_ready_status[id] = {"ready" : false, "path_to_label" : new_player_label}
 				UpdateLobbyPlayerList.rpc(current_interface.player_ready_status) # send updated player list to clients and update their view
 				UpdatePlayersDictionary.rpc(players)
@@ -78,7 +78,7 @@ func UpdatePlayersDictionary(new_players_dict):
 func UpdateLobbyPlayerList(player_list): # used for adding players and updating their ready status
 	# for all pieces of information given for each player in the list, update everything accordingly (i.e. ready up status)
 	current_interface.player_ready_status = player_list
-	for player in player_list:
+	for player in player_list: # for each player, make sure their label is visible and the text color reflects their ready status
 		# make sure label is visible
 		if !get_node(player_list[player]["path_to_label"]).visible:
 			get_node(player_list[player]["path_to_label"]).visible = true
@@ -87,9 +87,26 @@ func UpdateLobbyPlayerList(player_list): # used for adding players and updating 
 			get_node(player_list[player]["path_to_label"]).label_settings.font_color = Color(0.12, 0.76, 0.2)
 		else:
 			get_node(player_list[player]["path_to_label"]).label_settings.font_color = Color(0, 0, 0)
-			
+	# if all players are ready, enter the game
+	if multiplayer.is_server():
+		var all_ready = false
+		for player in player_list:
+			if player_list[player]["ready"]:
+				all_ready = true
+			else:
+				all_ready = false
+				break
+		if all_ready:
+			EnterGame.rpc()
+	
+	
 @rpc("any_peer", "call_local", "reliable", 0)
 func RemovePlayerFromLobbyList(id):
 	if current_interface.name == "LobbyMenu":
 		get_node(current_interface.player_ready_status[id]["path_to_label"]).visible = false
 		current_interface.player_ready_status.erase(id)
+		
+@rpc("authority", "call_local", "reliable", 0)
+func EnterGame():
+	print("Entering game")
+	SwitchInterface("MainGameplayInterface")
