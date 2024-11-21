@@ -2,7 +2,7 @@ extends Node2D
 var original_cards = load("res://card/CardStack.tscn").instantiate()
 enum suits {spades, hearts, clubs, diamonds}
 var player_cards_struct = {}
-signal cards_received # used to indicate when clients have received their cards from the server when first entering the game
+signal original_deck_shuffled # emitted when original cards are created and ready to be shuffled
 
 
 # Called when the node enters the scene tree for the first time.
@@ -12,6 +12,8 @@ func _ready() -> void:
 	original_cards.position = self.get_viewport_rect().size / Vector2(2,2)
 	self.add_child(original_cards)
 	# Create player cardstacks and distribute cards
+	if !multiplayer.is_server():
+		await original_deck_shuffled
 	prepare_player_cardstacks()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -36,6 +38,17 @@ func create_cards() -> void: #function to create deck, no joker for now
 			next_card.name = str(suit,card_number)
 			#add to original deck var
 			original_cards.add_to_bottom(next_card)
+			
+	# if we are the server, shuffle the cards and send the order to other players
+	if multiplayer.is_server():
+		# run shuffle on original_cards
+		original_cards.shuffle()
+		# send order to other players
+		var shuffled_order = []
+		for card in original_cards.get_children():
+			shuffled_order.append([card.number, card.suit])
+		SyncShuffle.rpc(shuffled_order)
+
 			
 func prepare_player_cardstacks() -> void: # try loading once and using that one variable to instantiate all of them, better coding practice
 	
@@ -89,10 +102,26 @@ func prepare_player_cardstacks() -> void: # try loading once and using that one 
 @rpc("any_peer", "call_local", "reliable", 0)
 func PlayerSlapped():
 	var called_by_player = multiplayer.get_remote_sender_id()
-	print(called_by_player," has slapped")
+
 
 @rpc("any_peer", "call_local", "reliable", 0)
 func PlayerPlayedCard():
 	var called_by_player = multiplayer.get_remote_sender_id()
-	print(called_by_player," has played a card ")
 	player_cards_struct[called_by_player].top_card_to_other_stack(original_cards)
+	original_cards.flip_card_at_top()
+	
+	
+@rpc() # should only be called on clients from server
+func SyncShuffle(order): # Server shuffles deck, this function is to send the new order of the deck to all clients
+	#await ready
+	var cards = []
+	for card_info in order:
+		for card in original_cards.get_children():
+			if card.number == card_info[0] and card.suit == card_info[1]:
+				cards.append(card)
+				original_cards.remove_child(card)
+				break
+	# once the cards have been properly reordered, add them back into original_cards, aka the center cardstack
+	for card in cards:
+		original_cards.add_child(card)
+	original_deck_shuffled.emit()

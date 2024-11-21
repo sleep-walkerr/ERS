@@ -23,7 +23,18 @@ func top_card_to_other_stack(destination_cardstack) -> void: # Sends the top car
 	remove_child(card_to_send)
 	destination_cardstack.add_to_bottom(card_to_send)
 	
+func flip_card_at_top() -> void:
+	get_child(get_child_count() -1).show_card()
 
 
 func shuffle() -> void:
-	pass
+	var cards = [] # shuffle function only exists for arrays/lists
+	for card in self.get_children(): # for each card in stack, add card to array, then remove it from self
+		cards.append(card)
+		self.remove_child(card)
+	# randomize the order of the cards using builtin shuffle fxn
+	cards.shuffle()
+	for card in cards:
+		self.add_child(card)
+		
+	
