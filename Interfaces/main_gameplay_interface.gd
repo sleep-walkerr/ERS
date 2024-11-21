@@ -4,7 +4,8 @@ enum suits {spades, hearts, clubs, diamonds}
 var player_cards_struct = {}
 var players_turn = null # indicates which player's turn it is
 var turn = -1 # the total number of turns, used to determine which player's turn it is
-var cards_owed = 0 # number of cards that must be played if the player before has played a face card
+var cards_owed = -1 # number of cards that must be played if the player before has played a face card, -1 means no face card played
+var cards_owed_to = null
 signal original_deck_shuffled # emitted when original cards are created and ready to be shuffled
 
 
@@ -30,9 +31,29 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void: # use switch/match statement here, match on event is action pressed
+	
+	
 	if(players_turn == multiplayer.get_unique_id() and event.is_action_pressed("click")):
 		PlayerPlayedCard.rpc()
-		if cards_owed == 0:
+		var top_card = original_cards.get_child(original_cards.get_child_count() - 1)
+		
+		if cards_owed > 0:
+			cards_owed = cards_owed - 1
+			# check if last card is face card
+			if top_card.number > 10: # if face card is played during chances, reset face card vars and move to next turn
+				cards_owed = -1
+				cards_owed_to = null
+				NextTurn.rpc(turn+1)
+			if cards_owed == 0:
+				# send cards to player who placed the face card
+				PlayerWonCards.rpc(cards_owed_to, [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit])
+				# set cards owed and owed to to -1 and null
+				cards_owed = -1
+				cards_owed_to = null
+			print("cards owed: ",cards_owed)
+		
+		
+		elif cards_owed == -1:
 			NextTurn.rpc(turn+1)
 	if(event.is_action_pressed("space")):
 		var card_slapped_on = [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit]
@@ -126,7 +147,7 @@ func CheckForSlapRules(card_slapped_on): # checks to see if player has a valid s
 			return true
 	return false
 			
-@rpc("authority", "call_local","reliable")
+@rpc("any_peer", "call_local","reliable")
 func PlayerWonCards(player_collecting, card_slapped_on): # generates the list of cards to send a player from the main cardstack, sends on all players ends
 	var won_stack = [] # stack that player will receive
 	var card_object
@@ -165,9 +186,9 @@ func PlayerPlayedCard():
 	var called_by_player = multiplayer.get_remote_sender_id()
 	player_cards_struct[called_by_player].top_card_to_other_stack(original_cards)
 	original_cards.flip_card_at_top()
-	if cards_owed > 0:
-		cards_owed = cards_owed - 1
 	
+	
+		
 
 	
 	
@@ -189,12 +210,15 @@ func SyncShuffle(order): # Server shuffles deck, this function is to send the ne
 	
 @rpc("any_peer", "call_local", "reliable", 0)
 func NextTurn(next_turn):
+
+	
+	var called_by_player = multiplayer.get_remote_sender_id()
 	turn = next_turn
 	players_turn = get_parent().players[turn % player_cards_struct.size()]
 	print("It is now ",players_turn,"'s turn")
 	
 		# if this is the server
-	if multiplayer.is_server():
+	if multiplayer.is_server() and cards_owed == -1: # this shouldnt be allowed to run again 
 		var top_card = original_cards.get_child(original_cards.get_child_count() - 1)
 		# check to see if last card played was a face card
 		if top_card != null and top_card.number > 10:
@@ -203,18 +227,22 @@ func NextTurn(next_turn):
 			match top_card.number:
 				11:
 					print("jack played")
-					SetCardsOwed.rpc(1)
+					SetCardsOwed.rpc(1, called_by_player)
 				12:
 					print("queen played")
-					SetCardsOwed.rpc(2)
+					SetCardsOwed.rpc(2, called_by_player)
 				13:
 					print("king played")
-					SetCardsOwed.rpc(3)
+					SetCardsOwed.rpc(3, called_by_player)
 				14:
 					print("ace played")
-					SetCardsOwed.rpc(4)
+					SetCardsOwed.rpc(4, called_by_player)
 
 @rpc("authority", "call_local", "reliable")
-func SetCardsOwed(number_owed):
+func SetCardsOwed(number_owed, owed_to):
 	if players_turn == multiplayer.get_unique_id(): # if its your turn, set the cards owed value
 		cards_owed = number_owed
+		cards_owed_to = owed_to
+	else:
+		cards_owed = -1
+		cards_owed_to = null
