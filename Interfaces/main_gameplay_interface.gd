@@ -4,6 +4,7 @@ enum suits {spades, hearts, clubs, diamonds}
 var player_cards_struct = {}
 var players_turn = null # indicates which player's turn it is
 var turn = -1 # the total number of turns, used to determine which player's turn it is
+var cards_owed = 0 # number of cards that must be played if the player before has played a face card
 signal original_deck_shuffled # emitted when original cards are created and ready to be shuffled
 
 
@@ -31,7 +32,8 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void: # use switch/match statement here, match on event is action pressed
 	if(players_turn == multiplayer.get_unique_id() and event.is_action_pressed("click")):
 		PlayerPlayedCard.rpc()
-		NextTurn.rpc(turn+1)
+		if cards_owed == 0:
+			NextTurn.rpc(turn+1)
 	if(event.is_action_pressed("space")):
 		var card_slapped_on = [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit]
 		PlayerSlapped.rpc(card_slapped_on)
@@ -163,6 +165,10 @@ func PlayerPlayedCard():
 	var called_by_player = multiplayer.get_remote_sender_id()
 	player_cards_struct[called_by_player].top_card_to_other_stack(original_cards)
 	original_cards.flip_card_at_top()
+	if cards_owed > 0:
+		cards_owed = cards_owed - 1
+	
+
 	
 	
 @rpc() # should only be called on clients from server
@@ -186,3 +192,29 @@ func NextTurn(next_turn):
 	turn = next_turn
 	players_turn = get_parent().players[turn % player_cards_struct.size()]
 	print("It is now ",players_turn,"'s turn")
+	
+		# if this is the server
+	if multiplayer.is_server():
+		var top_card = original_cards.get_child(original_cards.get_child_count() - 1)
+		# check to see if last card played was a face card
+		if top_card != null and top_card.number > 10:
+			print("last card played: ", top_card)
+			# call rpc on next player changing their card owed value
+			match top_card.number:
+				11:
+					print("jack played")
+					SetCardsOwed.rpc(1)
+				12:
+					print("queen played")
+					SetCardsOwed.rpc(2)
+				13:
+					print("king played")
+					SetCardsOwed.rpc(3)
+				14:
+					print("ace played")
+					SetCardsOwed.rpc(4)
+
+@rpc("authority", "call_local", "reliable")
+func SetCardsOwed(number_owed):
+	if players_turn == multiplayer.get_unique_id(): # if its your turn, set the cards owed value
+		cards_owed = number_owed
