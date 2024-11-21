@@ -20,3 +20,7 @@ func _process(delta: float) -> void:
 func show_card():
 	self.texture = card_front_texture
 	face_up = true
+
+func face_down():
+	self.texture = card_back_texture
+	face_up = false

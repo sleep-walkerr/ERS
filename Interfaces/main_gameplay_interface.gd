@@ -2,7 +2,11 @@ extends Node2D
 var original_cards = load("res://card/CardStack.tscn").instantiate()
 enum suits {spades, hearts, clubs, diamonds}
 var player_cards_struct = {}
+var players_turn = null # indicates which player's turn it is
+var turn = -1 # the total number of turns, used to determine which player's turn it is
 signal original_deck_shuffled # emitted when original cards are created and ready to be shuffled
+
+
 
 
 # Called when the node enters the scene tree for the first time.
@@ -15,6 +19,9 @@ func _ready() -> void:
 	if !multiplayer.is_server():
 		await original_deck_shuffled
 	prepare_player_cardstacks()
+	# Give server the first turn
+	if multiplayer.is_server():
+		NextTurn.rpc(0) # will always be same value at start, this is just for demonstration
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -22,10 +29,12 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void: # use switch/match statement here, match on event is action pressed
-	if(event.is_action_pressed("click")):
+	if(players_turn == multiplayer.get_unique_id() and event.is_action_pressed("click")):
 		PlayerPlayedCard.rpc()
+		NextTurn.rpc(turn+1)
 	if(event.is_action_pressed("space")):
-		PlayerSlapped.rpc()
+		var card_slapped_on = [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit]
+		PlayerSlapped.rpc(card_slapped_on)
 
 func create_cards() -> void: #function to create deck, no joker for now
 	for suit in suits:
@@ -51,8 +60,6 @@ func create_cards() -> void: #function to create deck, no joker for now
 
 			
 func prepare_player_cardstacks() -> void: # try loading once and using that one variable to instantiate all of them, better coding practice
-	
-
 	# Create card stacks for each player
 	for player in get_parent().players:
 		var player_cardstack = load("res://card/CardStack.tscn").instantiate()
@@ -98,10 +105,57 @@ func prepare_player_cardstacks() -> void: # try loading once and using that one 
 		player_cards_struct[not_me[x]].position = horizontal_player_alignment.get_point_position(x)
 		# add other player card stacks to scene
 		add_child(player_cards_struct[not_me[x]])
+
+func CheckForSlapRules(card_slapped_on): # checks to see if player has a valid slap, if so they get the cards
+	var check_stack = [] # temporary copy of the stack used to check if slap rules are matched
+	var card_object
+	var won_stack = false
+	# this needs to happen in case another player plays a card and latency prevents a proper update
+	# get index of card
+	for card in original_cards.get_children():
+		if card.number == card_slapped_on[0] and card.suit == card_slapped_on[1]:
+			card_object = card
+	# set check stack to a list of cards from index 0 to the index of the card object
+	for x in range(original_cards.get_node(card_object.get_path()).get_index() + 1):
+		check_stack.append(original_cards.get_child(x))
+	if check_stack.size() > 1:
+		#check for double
+		if check_stack[check_stack.size()-1].number == check_stack[check_stack.size()-2].number: # check top two cards to see if they are the same number
+			return true
+	return false
+			
+@rpc("authority", "call_local","reliable")
+func PlayerWonCards(player_collecting, card_slapped_on): # generates the list of cards to send a player from the main cardstack, sends on all players ends
+	var won_stack = [] # stack that player will receive
+	var card_object
+	for card in original_cards.get_children():
+		if card.number == card_slapped_on[0] and card.suit == card_slapped_on[1]:
+			card_object = card
+	# get the stack excluding any cards put down on top after player has slapped
+	for x in range(original_cards.get_node(card_object.get_path()).get_index() + 1):
+		won_stack.append(original_cards.get_child(x))
+	print(player_collecting," has won the cards:", won_stack)
+	# add cards to bottom of player stack and remove them from the central stack
+	for card in won_stack:
+		card.get_parent().remove_child(card) # remove from main stack
+		# flip card back over
+		card.face_down()
+		# add to player stack
+		player_cards_struct[player_collecting].add_to_bottom(card)
 		
 @rpc("any_peer", "call_local", "reliable", 0)
-func PlayerSlapped():
+func PlayerSlapped(card_slapped_on):
 	var called_by_player = multiplayer.get_remote_sender_id()
+	print(called_by_player, " slapped on ", card_slapped_on)
+	if multiplayer.is_server(): #if this is the server, check for slap rule matches
+		# if a rule is matched, the player who slapped gets the cards
+		if CheckForSlapRules(card_slapped_on):
+			print("Valid Slap")
+			PlayerWonCards.rpc(called_by_player,card_slapped_on)
+		else:
+			print("Invalid Slap")
+
+
 
 
 @rpc("any_peer", "call_local", "reliable", 0)
@@ -125,3 +179,10 @@ func SyncShuffle(order): # Server shuffles deck, this function is to send the ne
 	for card in cards:
 		original_cards.add_child(card)
 	original_deck_shuffled.emit()
+	
+	
+@rpc("any_peer", "call_local", "reliable", 0)
+func NextTurn(next_turn):
+	turn = next_turn
+	players_turn = get_parent().players[turn % player_cards_struct.size()]
+	print("It is now ",players_turn,"'s turn")

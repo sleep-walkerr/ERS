@@ -17,6 +17,7 @@ func add_to_bottom(card): # Change later, this is just to demo that cards are wo
 	else:
 		card.position = Vector2(0.5,0)
 	add_child(card)
+
 	
 func top_card_to_other_stack(destination_cardstack) -> void: # Sends the top card to another cardstack. **animation will be done here later
 	var card_to_send = self.get_child(0)
