@@ -9,9 +9,6 @@ var cards_owed_to = null
 var face_card_victim = null
 signal original_deck_shuffled # emitted when original cards are created and ready to be shuffled
 
-
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# populate other player identifier struct
@@ -57,6 +54,20 @@ func _input(event: InputEvent) -> void: # use switch/match statement here, match
 	if(event.is_action_pressed("space") and not original_cards.get_child_count() < 1):
 		var card_slapped_on = [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit]
 		PlayerSlapped.rpc(card_slapped_on)
+	#if event.is_action_pressed("Escape"):
+		#PlayerLeft.rpc(1,multiplayer.get_unique_id())
+		#
+		#get_parent().multiplayer.multiplayer_peer = null
+		#get_parent().SwitchInterface("MainMenu") 
+		
+@rpc("any_peer", "call_local", "reliable", 0)
+func PlayerLeft(player_id):
+	player_cards_struct.erase(multiplayer.get_unique_id())
+	UpdatePlayerCardsStruct.rpc(player_cards_struct)
+	
+@rpc("authority","call_local","reliable",0)
+func UpdatePlayerCardsStruct(new_struct):
+	player_cards_struct = new_struct
 
 func create_cards() -> void: #function to create deck, no joker for now
 	for suit in suits:
@@ -180,11 +191,39 @@ func PlayerSlapped(card_slapped_on):
 			print("Invalid Slap")
 			# penalize the player here
 			InvalidSlapOccurred.rpc(called_by_player)
-
+			# check for a winner
+			CheckForWinner()
+			
 @rpc("authority", "call_local", "reliable")
 func InvalidSlapOccurred(player_who_slapped):
 	player_cards_struct[player_who_slapped].send_card_for_penalty(original_cards)
 	SetCardCountIndicators()
+	
+	
+
+func CheckForWinner():
+	var still_alive_count = 0
+	var last_player_still_alive = null
+	# check if only one player has the cards
+	for player in player_cards_struct:
+		if player_cards_struct[player].get_child_count() > 0:
+			still_alive_count = still_alive_count + 1
+			last_player_still_alive = player
+	print(still_alive_count, last_player_still_alive)
+	if still_alive_count == 1 and last_player_still_alive != null:
+		PlayerWon.rpc(last_player_still_alive)
+	
+@rpc("authority", "call_local", "reliable")
+func PlayerWon(winning_player):
+	for child in get_children():
+		child.visible = false
+		$WinIndicator.text = str(winning_player, " has Won!")
+	$WinIndicator.visible = true
+	print("Player ",winning_player," has won!")
+	await get_tree().create_timer(10).timeout
+	get_parent().multiplayer.multiplayer_peer = null
+	get_parent().SwitchInterface("MainMenu")  
+	
 
 @rpc("any_peer", "call_local", "reliable", 0)
 func PlayerPlayedCard():
@@ -195,6 +234,7 @@ func PlayerPlayedCard():
 	if multiplayer.is_server():
 		if cards_owed_to == null and !CheckForFaceCard(called_by_player): # regular non-face card turn
 			NextTurn.rpc(turn+1)
+			CheckForWinner()
 			
 @rpc("any_peer","call_local","reliable",0) # this needs to be changed to only be called on the server via rpc multiplayer id
 func PlayedCardDuringCardDebt(): # version of player played card for when a player is playing their cards owed for a face card
@@ -205,14 +245,17 @@ func PlayedCardDuringCardDebt(): # version of player played card for when a play
 	
 	if multiplayer.is_server(): # if you are the server
 		if CheckForFaceCard(called_by_player): # if player plays a face card during face card debt phase, should exit and displace phase to next player
+			CheckForWinner()
 			return
 		elif cards_owed == 0: 
 			# player who played face card wins cards
 			var top_card = [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit]
 			#--this is necessary in case another player plays a card before the cards are collected, ensures that winner only gets the cards they are supposed to
+			await get_tree().create_timer(2).timeout
 			PlayerWonCards.rpc(cards_owed_to,top_card)
 			ExitFaceCardDebtPhase.rpc()
 			NextTurn.rpc(turn+1)
+			CheckForWinner()
 			
 @rpc("authority", "call_local", "reliable")
 func UpdateClientsCardStacks(): # this is for face card turns, seperates card stack updating to use await to prevent race condition
@@ -280,7 +323,7 @@ func SyncShuffle(order): # Server shuffles deck, this function is to send the ne
 	
 	
 @rpc("any_peer", "call_local", "reliable", 0)
-func NextTurn(next_turn):
+func NextTurn(next_turn): # moves to the next turn for all players, unless only one player has the cards
 	turn = next_turn
 	players_turn = get_parent().players[turn % player_cards_struct.size()]
 	print("It is now ",players_turn,"'s turn")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cv4ux0seenp62"]
+[gd_scene load_steps=12 format=3 uid="uid://cv4ux0seenp62"]
 
 [ext_resource type="Script" path="res://Interfaces/main_gameplay_interface.gd" id="1_mt75l"]
 [ext_resource type="PackedScene" uid="uid://dgwkyqmtaet5k" path="res://card/CardStack.tscn" id="2_7uny3"]
@@ -42,6 +42,19 @@ border_width_top = 5
 border_width_right = 5
 border_width_bottom = 5
 border_color = Color(0, 0.8, 0.8, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3gqfx"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.272088, 0.956649, 2.31028e-06, 1)
+border_blend = true
 corner_radius_top_left = 15
 corner_radius_top_right = 15
 corner_radius_bottom_right = 15
@@ -272,3 +285,26 @@ texture = ExtResource("5_g4jrr")
 [node name="SlapButton" type="TextureRect" parent="HBoxContainer/HBoxContainer"]
 layout_mode = 2
 texture = ExtResource("6_7e1ha")
+
+[node name="WinIndicator" type="Label" parent="."]
+visible = false
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -151.0
+offset_top = -26.5
+offset_right = 151.0
+offset_bottom = 26.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_3gqfx")
+text = "Player -1 has Won!"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -59,7 +59,9 @@ func ClientConnectedToServer(id): # only called on server when clients connect
 		multiplayer.multiplayer_peer.refuse_new_connections = true
 		multiplayer.multiplayer_peer.disconnect_peer(id)
 		print("Refusing new connections...")
-	
+		
+		
+@rpc("any_peer", "call_remote", "reliable", 0)
 func ClientDisconnectedFromServer(id): # server signal for when clients disconnect
 	# needs updating for changes to players
 	print(id, " has disconnected...")
