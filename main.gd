@@ -1,7 +1,8 @@
 extends Control
 var current_interface
 var player_number
-var players = {} # key is player id, value is player number
+var players = {} # key is player number, value is player id
+var players_by_id = {} # key is player id, value is player number
 
 
 

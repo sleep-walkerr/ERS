@@ -1,11 +1,12 @@
-extends Node2D
-var original_cards = load("res://card/CardStack.tscn").instantiate()
+extends Control
+var original_cards
 enum suits {spades, hearts, clubs, diamonds}
 var player_cards_struct = {}
 var players_turn = null # indicates which player's turn it is
 var turn = -1 # the total number of turns, used to determine which player's turn it is
 var cards_owed = -1 # number of cards that must be played if the player before has played a face card, -1 means no face card played
 var cards_owed_to = null
+var face_card_victim = null
 signal original_deck_shuffled # emitted when original cards are created and ready to be shuffled
 
 
@@ -13,10 +14,12 @@ signal original_deck_shuffled # emitted when original cards are created and read
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# populate other player identifier struct
+	for player in get_parent().players:
+		get_parent().players_by_id[get_parent().players[player]] = player
+	original_cards = $CenterContainer/original_cards
 	# Create deck and add to scene
 	create_cards()
-	original_cards.position = self.get_viewport_rect().size / Vector2(2,2)
-	self.add_child(original_cards)
 	# Create player cardstacks and distribute cards
 	if !multiplayer.is_server():
 		await original_deck_shuffled
@@ -24,38 +27,34 @@ func _ready() -> void:
 	# Give server the first turn
 	if multiplayer.is_server():
 		NextTurn.rpc(0) # will always be same value at start, this is just for demonstration
-
+	# update card amounts
+	SetCardCountIndicators()
+	# change playerlabel to reflect which player you are
+	$HBoxContainer/PlayerLabel.text = str("Player ",get_parent().players_by_id[multiplayer.get_unique_id()]+1)
+		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func _process(delta: float) -> void: # fix this later
+	for player in player_cards_struct:
+		player_cards_struct[player].position_cards()
+		if player != players_turn: # if it isn't the players turn, change the color of their deck
+			player_cards_struct[player].modulate = Color(0.0, 1.0, 1.0)
+		else: player_cards_struct[player].modulate = Color(1.0, 1.0, 1.0)
+	original_cards.position_cards()
+	if original_cards.get_child_count() < 1:
+		$HBoxContainer/HBoxContainer/SlapButton.visible = false
+	else: $HBoxContainer/HBoxContainer/SlapButton.visible = true
+	if players_turn != multiplayer.get_unique_id():
+		$HBoxContainer/HBoxContainer/PlayButton.visible = false
+	else: $HBoxContainer/HBoxContainer/PlayButton.visible = true
 
 
 func _input(event: InputEvent) -> void: # use switch/match statement here, match on event is action pressed
-	
-	
 	if(players_turn == multiplayer.get_unique_id() and event.is_action_pressed("click")):
-		PlayerPlayedCard.rpc()
-		var top_card = original_cards.get_child(original_cards.get_child_count() - 1)
-		
-		if cards_owed > 0:
-			cards_owed = cards_owed - 1
-			# check if last card is face card
-			if top_card.number > 10: # if face card is played during chances, reset face card vars and move to next turn
-				cards_owed = -1
-				cards_owed_to = null
-				NextTurn.rpc(turn+1)
-			if cards_owed == 0:
-				# send cards to player who placed the face card
-				PlayerWonCards.rpc(cards_owed_to, [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit])
-				# set cards owed and owed to to -1 and null
-				cards_owed = -1
-				cards_owed_to = null
-			print("cards owed: ",cards_owed)
-		
-		
-		elif cards_owed == -1:
-			NextTurn.rpc(turn+1)
-	if(event.is_action_pressed("space")):
+		if cards_owed_to == null:
+			PlayerPlayedCard.rpc()	
+		elif cards_owed_to != null:
+			PlayedCardDuringCardDebt.rpc() # run separate function for when a player is paying their card debt
+	if(event.is_action_pressed("space") and not original_cards.get_child_count() < 1):
 		var card_slapped_on = [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit]
 		PlayerSlapped.rpc(card_slapped_on)
 
@@ -69,7 +68,7 @@ func create_cards() -> void: #function to create deck, no joker for now
 			next_card.card_front_texture = load("res://svg_playing_cards/fronts/"+str(suit)+"_"+str(card_number)+".svg")
 			next_card.name = str(suit,card_number)
 			#add to original deck var
-			original_cards.add_to_bottom(next_card)
+			original_cards.add_to_top(next_card)
 			
 	# if we are the server, shuffle the cards and send the order to other players
 	if multiplayer.is_server():
@@ -84,51 +83,23 @@ func create_cards() -> void: #function to create deck, no joker for now
 			
 func prepare_player_cardstacks() -> void: # try loading once and using that one variable to instantiate all of them, better coding practice
 	# Create card stacks for each player
-	for player in get_parent().players:
-		var player_cardstack = load("res://card/CardStack.tscn").instantiate()
-		player_cards_struct[get_parent().players[player]] = player_cardstack # Assign player card stack to id in dictionary
+	for x in range(get_parent().players.size()):
+		player_cards_struct[get_parent().players[x]] = $PlayerCardStacksContainer.get_child(x).get_child(0)
+		$PlayerCardStacksContainer.get_child(x).visible = true
+
 	# For each cardstack, add 1 card until all cards from deck are gone
 	var current_index = 0 # iterator used to determine which cardstack to send to next
 	for card in original_cards.get_children():
 		original_cards.top_card_to_other_stack(player_cards_struct[get_parent().players[current_index % player_cards_struct.size()]])
 		current_index = current_index + 1
+	
+func SetCardCountIndicators() -> void:
+	$PlayerCardStacksContainer/VBoxContainer/HBoxContainer/CardCount.text = str($PlayerCardStacksContainer/VBoxContainer/Player1.get_child_count())
+	$PlayerCardStacksContainer/VBoxContainer2/HBoxContainer/CardCount.text = str($PlayerCardStacksContainer/VBoxContainer2/Player2.get_child_count())
+	$PlayerCardStacksContainer/VBoxContainer3/HBoxContainer/CardCount.text = str($PlayerCardStacksContainer/VBoxContainer3/Player3.get_child_count())
+	$PlayerCardStacksContainer/VBoxContainer4/HBoxContainer/CardCount.text = str($PlayerCardStacksContainer/VBoxContainer4/Player4.get_child_count())
+	
 		
-
-	
-	# Position Stacks
-	#--For now just quarter screen and add static positions for each player, will change when multiplayer is implemented
-	var viewport_x = get_viewport_rect().size.x
-	var viewport_y = get_viewport_rect().size.y
-	
-	#--Position Self Cardstack
-	player_cards_struct[multiplayer.get_unique_id()].position = Vector2(viewport_x / 2, (viewport_y - (viewport_y / 4)))
-	# Rename Self Cardstack
-	player_cards_struct[multiplayer.get_unique_id()].name = str(multiplayer.get_unique_id(),"_CardStack")
-	# Actually add cardstack to scene
-	add_child(player_cards_struct[multiplayer.get_unique_id()])
-	
-	#Position Other Players' Cardstacks
-	#--Set up other players horizontal positions along a line
-	var horizontal_player_alignment = Line2D.new()
-	var increment =  viewport_x / player_cards_struct.size() # find even spacing for players along the horizontal line
-	# Add cardstack horizontal positions
-	for x in range(1,player_cards_struct.size()):
-		horizontal_player_alignment.add_point(Vector2(increment*x,viewport_y / 8))
-	# Add line to scene tree
-	add_child(horizontal_player_alignment)
-	
-	 # For each player that isn't you, place their stack at one of the points
-	var not_me = []
-	# get ids of all other players
-	for player in player_cards_struct:
-		if player != multiplayer.get_unique_id():
-			not_me.append(player)
-	
-	for x in range(not_me.size()): # for as many points aka other players, position each one and add to scene
-		player_cards_struct[not_me[x]].position = horizontal_player_alignment.get_point_position(x)
-		# add other player card stacks to scene
-		add_child(player_cards_struct[not_me[x]])
-
 func CheckForSlapRules(card_slapped_on): # checks to see if player has a valid slap, if so they get the cards
 	var check_stack = [] # temporary copy of the stack used to check if slap rules are matched
 	var card_object
@@ -144,6 +115,32 @@ func CheckForSlapRules(card_slapped_on): # checks to see if player has a valid s
 	if check_stack.size() > 1:
 		#check for double
 		if check_stack[check_stack.size()-1].number == check_stack[check_stack.size()-2].number: # check top two cards to see if they are the same number
+			print("slap rule: double matched")
+			return true
+		#check for sandwhich
+		elif check_stack[check_stack.size()-1].number == check_stack[check_stack.size()-3].number and check_stack[check_stack.size()-1].suit != check_stack[check_stack.size()-3].suit: # godot handles negative indicies by replacing them with 0
+			print(check_stack[check_stack.size()-1],check_stack[check_stack.size()-3])
+			print("slap rule: sandwhich matched")
+			return true
+		# check for top bottom rule
+		elif check_stack[0].number == check_stack[check_stack.size()-1].number:
+			print("slap rule: top bottom matched")
+			return true
+		# tens rule, ace will not work properly here for now
+		elif check_stack[check_stack.size()-1].number + check_stack[check_stack.size()-2].number == 10 or check_stack[check_stack.size()-1].number + check_stack[check_stack.size()-3].number == 10 and check_stack[check_stack.size()-2].number > 10:
+			print("slap rule: tens matched")
+			return true
+		# four in a row
+		elif check_stack[check_stack.size()-4].number == check_stack[check_stack.size()-1].number - 3 and check_stack[check_stack.size()-3].number == check_stack[check_stack.size()-1].number - 2 and check_stack[check_stack.size()-2].number == check_stack[check_stack.size()-1].number - 1:
+			print("slap rule: four in a ROW matched")
+			return true
+		# four in a row descending
+		elif check_stack[check_stack.size()-4].number == check_stack[check_stack.size()-1].number + 3 and check_stack[check_stack.size()-3].number == check_stack[check_stack.size()-1].number + 2 and check_stack[check_stack.size()-2].number == check_stack[check_stack.size()-1].number + 1:
+			print("slap rule: four in a ROW matched")
+			return true
+		# marriage
+		elif check_stack[check_stack.size()-1].number == 12 and check_stack[check_stack.size()-2].number == 13 or check_stack[check_stack.size()-1].number == 13 and check_stack[check_stack.size()-2].number == 12:
+			print("slap rule: marriage matched")
 			return true
 	return false
 			
@@ -151,20 +148,23 @@ func CheckForSlapRules(card_slapped_on): # checks to see if player has a valid s
 func PlayerWonCards(player_collecting, card_slapped_on): # generates the list of cards to send a player from the main cardstack, sends on all players ends
 	var won_stack = [] # stack that player will receive
 	var card_object
-	for card in original_cards.get_children():
-		if card.number == card_slapped_on[0] and card.suit == card_slapped_on[1]:
-			card_object = card
+	while card_object == null: # this is a bandaid fix, get confirmation that all players have received the change in the future
+		for card in original_cards.get_children():
+			if card.number == card_slapped_on[0] and card.suit == card_slapped_on[1]:
+				card_object = card
 	# get the stack excluding any cards put down on top after player has slapped
 	for x in range(original_cards.get_node(card_object.get_path()).get_index() + 1):
 		won_stack.append(original_cards.get_child(x))
 	print(player_collecting," has won the cards:", won_stack)
 	# add cards to bottom of player stack and remove them from the central stack
+	#await get_tree().create_timer(1).timeout
 	for card in won_stack:
 		card.get_parent().remove_child(card) # remove from main stack
 		# flip card back over
 		card.face_down()
 		# add to player stack
-		player_cards_struct[player_collecting].add_to_bottom(card)
+		player_cards_struct[player_collecting].add_to_top(card)
+	SetCardCountIndicators()
 		
 @rpc("any_peer", "call_local", "reliable", 0)
 func PlayerSlapped(card_slapped_on):
@@ -175,20 +175,91 @@ func PlayerSlapped(card_slapped_on):
 		if CheckForSlapRules(card_slapped_on):
 			print("Valid Slap")
 			PlayerWonCards.rpc(called_by_player,card_slapped_on)
+			ExitFaceCardDebtPhase.rpc()
 		else:
 			print("Invalid Slap")
+			# penalize the player here
+			InvalidSlapOccurred.rpc(called_by_player)
 
-
-
+@rpc("authority", "call_local", "reliable")
+func InvalidSlapOccurred(player_who_slapped):
+	player_cards_struct[player_who_slapped].send_card_for_penalty(original_cards)
+	SetCardCountIndicators()
 
 @rpc("any_peer", "call_local", "reliable", 0)
 func PlayerPlayedCard():
 	var called_by_player = multiplayer.get_remote_sender_id()
 	player_cards_struct[called_by_player].top_card_to_other_stack(original_cards)
 	original_cards.flip_card_at_top()
+	SetCardCountIndicators()
+	if multiplayer.is_server():
+		if cards_owed_to == null and !CheckForFaceCard(called_by_player): # regular non-face card turn
+			NextTurn.rpc(turn+1)
+			
+@rpc("any_peer","call_local","reliable",0) # this needs to be changed to only be called on the server via rpc multiplayer id
+func PlayedCardDuringCardDebt(): # version of player played card for when a player is playing their cards owed for a face card
+	var called_by_player = multiplayer.get_remote_sender_id()
+	if multiplayer.is_server():
+		UpdateClientsCardStacks.rpc()
+
+	
+	if multiplayer.is_server(): # if you are the server
+		if CheckForFaceCard(called_by_player): # if player plays a face card during face card debt phase, should exit and displace phase to next player
+			return
+		elif cards_owed == 0: 
+			# player who played face card wins cards
+			var top_card = [original_cards.get_child(original_cards.get_child_count()-1).number,original_cards.get_child(original_cards.get_child_count()-1).suit]
+			#--this is necessary in case another player plays a card before the cards are collected, ensures that winner only gets the cards they are supposed to
+			PlayerWonCards.rpc(cards_owed_to,top_card)
+			ExitFaceCardDebtPhase.rpc()
+			NextTurn.rpc(turn+1)
+			
+@rpc("authority", "call_local", "reliable")
+func UpdateClientsCardStacks(): # this is for face card turns, seperates card stack updating to use await to prevent race condition
+	print("In a card debt turn...") # race condition is a symptom of a missing synchronization system, for next implementation
+	var called_by_player = multiplayer.get_remote_sender_id()
+	player_cards_struct[face_card_victim].top_card_to_other_stack(original_cards)
+	original_cards.flip_card_at_top()
+	SetCardCountIndicators()
+	cards_owed = cards_owed - 1
 	
 	
-		
+func CheckForFaceCard(called_by_player):
+	var top_card = original_cards.get_child(original_cards.get_child_count() - 1)
+	# check to see if last card played was a face card
+	if top_card != null and top_card.number > 10:
+		print("last card played: ", top_card)
+		# call next turn and then use the new player value to assign owed cards
+		match top_card.number:
+			11:
+				print("jack played")
+				ExitFaceCardDebtPhase.rpc()
+				cards_owed_to = players_turn
+				NextTurn.rpc(turn+1)
+				SetCardsOwed.rpc(1, cards_owed_to)
+				return true
+			12:
+				print("queen played")
+				ExitFaceCardDebtPhase.rpc()
+				cards_owed_to = players_turn
+				NextTurn.rpc(turn+1)
+				SetCardsOwed.rpc(2, cards_owed_to)
+				return true
+			13:
+				print("king played")
+				ExitFaceCardDebtPhase.rpc()
+				cards_owed_to = players_turn
+				NextTurn.rpc(turn+1)
+				SetCardsOwed.rpc(3, cards_owed_to)
+				return true
+			14:
+				print("ace played")
+				ExitFaceCardDebtPhase.rpc()
+				cards_owed_to = players_turn
+				NextTurn.rpc(turn+1)
+				SetCardsOwed.rpc(4, cards_owed_to)	
+				return true
+	return false
 
 	
 	
@@ -210,39 +281,20 @@ func SyncShuffle(order): # Server shuffles deck, this function is to send the ne
 	
 @rpc("any_peer", "call_local", "reliable", 0)
 func NextTurn(next_turn):
-
-	
-	var called_by_player = multiplayer.get_remote_sender_id()
 	turn = next_turn
 	players_turn = get_parent().players[turn % player_cards_struct.size()]
 	print("It is now ",players_turn,"'s turn")
 	
-		# if this is the server
-	if multiplayer.is_server() and cards_owed == -1: # this shouldnt be allowed to run again 
-		var top_card = original_cards.get_child(original_cards.get_child_count() - 1)
-		# check to see if last card played was a face card
-		if top_card != null and top_card.number > 10:
-			print("last card played: ", top_card)
-			# call rpc on next player changing their card owed value
-			match top_card.number:
-				11:
-					print("jack played")
-					SetCardsOwed.rpc(1, called_by_player)
-				12:
-					print("queen played")
-					SetCardsOwed.rpc(2, called_by_player)
-				13:
-					print("king played")
-					SetCardsOwed.rpc(3, called_by_player)
-				14:
-					print("ace played")
-					SetCardsOwed.rpc(4, called_by_player)
 
 @rpc("authority", "call_local", "reliable")
 func SetCardsOwed(number_owed, owed_to):
-	if players_turn == multiplayer.get_unique_id(): # if its your turn, set the cards owed value
-		cards_owed = number_owed
-		cards_owed_to = owed_to
-	else:
-		cards_owed = -1
-		cards_owed_to = null
+	cards_owed_to = owed_to
+	cards_owed = number_owed
+	face_card_victim = players_turn
+
+	
+@rpc("authority", "call_local", "reliable")
+func ExitFaceCardDebtPhase():
+	cards_owed_to = null
+	cards_owed = -1
+	face_card_victim = null

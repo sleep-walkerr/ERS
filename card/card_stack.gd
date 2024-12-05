@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 
 # Called when the node enters the scene tree for the first time.
@@ -10,17 +10,29 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-func add_to_bottom(card): # Change later, this is just to demo that cards are working properly
-	if self.get_child_count() > 0:
-		var new_position = (self.get_child(get_child_count()-1)).position + Vector2(0.5,0)
-		card.position = new_position
-	else:
-		card.position = Vector2(0.5,0)
+func add_to_top(card): # Change later, this is just to demo that cards are working properly
 	add_child(card)
-
+	position_cards()
+	
+func add_to_bottom(card):
+	add_child(card)
+	move_child(card,0)
+	position_cards()
+	
+func position_cards() -> void:
+	var spacer = Vector2(0,0)
+	for each_card in get_children():
+		each_card.position = spacer + size / 2
+		spacer = spacer + Vector2(0.2,0)
 	
 func top_card_to_other_stack(destination_cardstack) -> void: # Sends the top card to another cardstack. **animation will be done here later
 	var card_to_send = self.get_child(0)
+	remove_child(card_to_send)
+	destination_cardstack.add_to_top(card_to_send)
+	
+func send_card_for_penalty(destination_cardstack) -> void:
+	var card_to_send = self.get_child(0)
+	card_to_send.face_down()
 	remove_child(card_to_send)
 	destination_cardstack.add_to_bottom(card_to_send)
 	
