@@ -217,7 +217,7 @@ func CheckForWinner():
 func PlayerWon(winning_player):
 	for child in get_children():
 		child.visible = false
-		$WinIndicator.text = str(winning_player, " has Won!")
+		$WinIndicator.text = str(get_parent().players_by_id[winning_player], " has Won!")
 	$WinIndicator.visible = true
 	print("Player ",winning_player," has won!")
 	await get_tree().create_timer(10).timeout
