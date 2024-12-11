@@ -1,0 +1,310 @@
+[gd_scene load_steps=12 format=3 uid="uid://cv4ux0seenp62"]
+
+[ext_resource type="Script" path="res://Interfaces/main_gameplay_interface.gd" id="1_mt75l"]
+[ext_resource type="PackedScene" uid="uid://dgwkyqmtaet5k" path="res://card/CardStack.tscn" id="2_7uny3"]
+[ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="2_bkid7"]
+[ext_resource type="FontFile" uid="uid://dfwpq8hknmqt3" path="res://Rubik/Rubik-VariableFont_wght.ttf" id="4_6xnqa"]
+[ext_resource type="Texture2D" uid="uid://dcd34p2tqwqfi" path="res://Interfaces/play_card.png" id="5_g4jrr"]
+[ext_resource type="Texture2D" uid="uid://bt0bytjqml1cp" path="res://Interfaces/slap_button.png" id="6_7e1ha"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_qvfw2"]
+radius = 50.0
+height = 100.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_epvkr"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c8rvw"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 1, 1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yt5th"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0.8, 0.8, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3gqfx"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.272088, 0.956649, 2.31028e-06, 1)
+border_blend = true
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[node name="MainGameplayInterface" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mt75l")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 1)
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+modulate = Color(0, 1, 1, 1)
+position = Vector2(960, 200)
+scale = Vector2(3, 3)
+mesh = SubResource("SphereMesh_qvfw2")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("2_bkid7")
+stretch_mode = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+custom_minimum_size = Vector2(0, 650)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -117.0
+offset_right = 117.0
+offset_bottom = 650.0
+grow_horizontal = 2
+
+[node name="original_cards" parent="CenterContainer" instance=ExtResource("2_7uny3")]
+layout_mode = 2
+
+[node name="PlayerCardStacksContainer" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(1200, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -600.0
+offset_top = -530.0
+offset_right = 600.0
+offset_bottom = -197.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlayerCardStacksContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Player1" parent="PlayerCardStacksContainer/VBoxContainer" instance=ExtResource("2_7uny3")]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerCardStacksContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayerNumber" type="Label" parent="PlayerCardStacksContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_epvkr")
+text = "P1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardCount" type="Label" parent="PlayerCardStacksContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_c8rvw")
+text = "-1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="PlayerCardStacksContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Player2" parent="PlayerCardStacksContainer/VBoxContainer2" instance=ExtResource("2_7uny3")]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerCardStacksContainer/VBoxContainer2"]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayerNumber" type="Label" parent="PlayerCardStacksContainer/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_epvkr")
+text = "P2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardCount" type="Label" parent="PlayerCardStacksContainer/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_c8rvw")
+text = "-1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="PlayerCardStacksContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Player3" parent="PlayerCardStacksContainer/VBoxContainer3" instance=ExtResource("2_7uny3")]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerCardStacksContainer/VBoxContainer3"]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayerNumber" type="Label" parent="PlayerCardStacksContainer/VBoxContainer3/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_epvkr")
+text = "P3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardCount" type="Label" parent="PlayerCardStacksContainer/VBoxContainer3/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_c8rvw")
+text = "-1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="PlayerCardStacksContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Player4" parent="PlayerCardStacksContainer/VBoxContainer4" instance=ExtResource("2_7uny3")]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerCardStacksContainer/VBoxContainer4"]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayerNumber" type="Label" parent="PlayerCardStacksContainer/VBoxContainer4/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_epvkr")
+text = "P4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardCount" type="Label" parent="PlayerCardStacksContainer/VBoxContainer4/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_c8rvw")
+text = "-1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="PlayerLabel" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(225, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_yt5th")
+text = "Player -1"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="PlayButton" type="TextureRect" parent="HBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("5_g4jrr")
+
+[node name="SlapButton" type="TextureRect" parent="HBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("6_7e1ha")
+
+[node name="WinIndicator" type="Label" parent="."]
+visible = false
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -151.0
+offset_top = -26.5
+offset_right = 151.0
+offset_bottom = 26.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_6xnqa")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_3gqfx")
+text = "Player -1 has Won!"
+horizontal_alignment = 1
+vertical_alignment = 1

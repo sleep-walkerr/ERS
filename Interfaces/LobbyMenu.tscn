@@ -1,0 +1,270 @@
+[gd_scene load_steps=18 format=3 uid="uid://byx0mfk606ssv"]
+
+[ext_resource type="Script" path="res://Interfaces/lobby_menu.gd" id="1_6ojlm"]
+[ext_resource type="Texture2D" uid="uid://ct7cxv4hudj8e" path="res://Background.png" id="2_n84fe"]
+[ext_resource type="FontFile" uid="uid://xo4k2q4thc2f" path="res://Rubik/static/Rubik-Bold.ttf" id="3_acp3w"]
+[ext_resource type="FontFile" uid="uid://dfwpq8hknmqt3" path="res://Rubik/Rubik-VariableFont_wght.ttf" id="4_1k7x1"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_5clkg"]
+radius = 50.0
+height = 100.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_27m3y"]
+font = ExtResource("3_acp3w")
+font_size = 36
+font_color = Color(0, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dcjkc"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0.8, 0.8, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="LabelSettings" id="LabelSettings_l1evl"]
+font = ExtResource("4_1k7x1")
+font_size = 30
+outline_size = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_576lu"]
+bg_color = Color(0.780392, 0.780392, 0.780392, 0.768627)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4c7li"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="LabelSettings" id="LabelSettings_dxpft"]
+font = ExtResource("4_1k7x1")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_btbkg"]
+font = ExtResource("4_1k7x1")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_wjekt"]
+font = ExtResource("4_1k7x1")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_dl340"]
+font = ExtResource("4_1k7x1")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gn806"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.129412, 0.760784, 0.027451, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yj67o"]
+bg_color = Color(0.129412, 0.760784, 0.027451, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g7qxu"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[node name="LobbyMenu" type="CenterContainer"]
+clip_contents = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_6ojlm")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 2
+color = Color(0, 0, 0, 1)
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+modulate = Color(0, 1, 1, 1)
+position = Vector2(960, 200)
+scale = Vector2(3, 3)
+mesh = SubResource("SphereMesh_5clkg")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("2_n84fe")
+stretch_mode = 3
+
+[node name="CenterContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="LobbyIDLabel" type="Label" parent="CenterContainer"]
+layout_mode = 2
+text = "Lobby"
+label_settings = SubResource("LabelSettings_27m3y")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LobbyID" type="Label" parent="CenterContainer"]
+custom_minimum_size = Vector2(225, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_dcjkc")
+text = "127.0.0.1"
+label_settings = SubResource("LabelSettings_l1evl")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(325, 430)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_576lu")
+
+[node name="PanelLayout" type="VBoxContainer" parent="CenterContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Spacer" type="Label" parent="CenterContainer/Panel/PanelLayout"]
+custom_minimum_size = Vector2(200, 30)
+layout_mode = 2
+
+[node name="PlayerLabels" type="VBoxContainer" parent="CenterContainer/Panel/PanelLayout"]
+custom_minimum_size = Vector2(0, 325)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Player1Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("4_1k7x1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
+text = "Player 1"
+label_settings = SubResource("LabelSettings_dxpft")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player2Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("4_1k7x1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
+text = "Player 2"
+label_settings = SubResource("LabelSettings_btbkg")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player3Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("4_1k7x1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
+text = "Player 3"
+label_settings = SubResource("LabelSettings_wjekt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player4Label" type="Label" parent="CenterContainer/Panel/PanelLayout/PlayerLabels"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("4_1k7x1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_4c7li")
+text = "Player 4"
+label_settings = SubResource("LabelSettings_dl340")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterContainer" type="VBoxContainer" parent="CenterContainer/Panel/PanelLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 2
+
+[node name="ReadyButton" type="Button" parent="CenterContainer/Panel/PanelLayout/CenterContainer"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+focus_mode = 0
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_1k7x1")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/hover = SubResource("StyleBoxFlat_gn806")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yj67o")
+theme_override_styles/normal = SubResource("StyleBoxFlat_g7qxu")
+toggle_mode = true
+text = "Ready"
+
+[node name="Spacer" type="Label" parent="CenterContainer/Panel/PanelLayout/CenterContainer"]
+custom_minimum_size = Vector2(100, 25)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="ReturnButton" type="Button" parent="CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Return"
+
+[connection signal="toggled" from="CenterContainer/Panel/PanelLayout/CenterContainer/ReadyButton" to="." method="_on_ready_button_toggled"]
